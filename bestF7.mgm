@@ -1,0 +1,54 @@
+
+// This script contains the construction of the [57,12,34] code over F_7
+ 
+//---------------------------------------
+// Step 1 - THE CONTEXT -
+//---------------------------------------
+
+clear;
+F7:=FiniteField(7);
+R<X>:=PolynomialRing(F7,1);
+P2<x,y,z>:=ProjectiveSpace(F7,2);
+P1<u,v>:=ProjectiveSpace(F7,1);
+Veronese:=map<P1->P2|[u^2,u*v,v^2]>;
+
+//----------------------------------------
+// Step 2 - THE POINT OF DEGREE 3 -
+//----------------------------------------
+
+// We have to construct a point of degree 3 in the projective plane
+// which is not contained in a line. To do that we will use a point 
+// of degree 3 of the conic given by the image of the Veronese map.
+
+// First let us take an irreducible polynomial over F_7, which we will homogenize.
+
+h:=u^3-2*v^3;
+
+// Then, construct the corresponding closed point in P^1...
+Z0:=Scheme(P1,h);
+
+// ...and map it into P^2.
+Z1:=Veronese(Z0);
+
+//-----------------------------------------
+// Step 3 - THE SPACE OF FUNCTIONS -
+//-----------------------------------------
+
+// Now we will consider the Linear system yielding our set of functions.
+
+L:=LinearSystem(P2,4);
+L:=LinearSystem(L,Z1);
+S:=Sections(L);
+
+//-----------------------------------------
+// Step 4 - THE SET OF POINTS -
+//----------------------------------------
+
+Points:=RationalPoints(P2);
+List:=[Coordinates(p): p in Points];
+delete Points;
+
+// Now we can generate the code.
+
+C:=LinearCode<F7,57 |[[Evaluate(f,p): p in List]: f in S]>;
+
